@@ -1,0 +1,13 @@
+﻿@model NgoMinhHung_2280601103.Models.Category
+@{
+    ViewData["Title"] = "Update Category";
+}
+<h2>Update Category</h2>
+<form asp-action="Update" method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>
