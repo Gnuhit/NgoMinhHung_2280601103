@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
-
+using Microsoft.AspNetCore.Authorization;
 public class ProductController : Controller
 {
     private readonly IProductRepository _productRepository;
