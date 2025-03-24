@@ -1,14 +1,12 @@
 ﻿@model IEnumerable<NgoMinhHung_2280601103.Models.Product>
 @{
-    ViewData["Title"] = "Products";
-}
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Product Management";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Products</h2>
+<h2>Product Management</h2>
 <p>
-    <a asp-action="Add" class="btn btn-primary">Add New Product</a>
+    <a asp-area="Admin" asp-action="Add" class="btn btn-primary">Add New Product</a>
 </p>
 <table class="table">
     <thead>
@@ -17,6 +15,7 @@
             <th>Price</th>
             <th>Description</th>
             <th>Category</th>
+            <th>Image</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -27,14 +26,19 @@
                 <td>@product.Name</td>
                 <td>@product.Price</td>
                 <td>@product.Description</td>
-                <td>@product.Category?.Name ?? "No Category"</td>
+                <td>@product.Category?.Name"</td>
                 <td>
-                    <a asp-action="Display" asp-route-id="@product.Id">View</a> |
-                    <a asp-action="Update" asp-route-id="@product.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@product.Id">Delete</a>
+                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                    {
+                        <img src="@product.ImageUrl" alt="@product.Name" style="max-width: 100px;" />
+                    }
+                </td>
+                <td>
+                    <a asp-area="Admin" asp-action="Details" asp-route-id="@product.Id" class="btn btn-info">Details</a>
+                    <a asp-area="Admin" asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning">Edit</a>
+                    <a asp-area="Admin" asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-

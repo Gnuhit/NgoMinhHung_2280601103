@@ -41,25 +41,32 @@ namespace NgoMinhHung_2280601103.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (imageUrl != null)
+                if (imageUrl != null && imageUrl.Length > 0)
                 {
                     product.ImageUrl = await SaveImage(imageUrl);
                 }
-                if (imageUrls != null)
+
+                await _productRepository.AddAsync(product);
+
+                if (imageUrls != null && imageUrls.Count > 0)
                 {
                     product.Images = new List<ProductImage>();
                     foreach (var file in imageUrls)
                     {
-                        var image = new ProductImage
+                        if (file != null && file.Length > 0)
                         {
-                            Url = await SaveImage(file),
-                            ProductId = product.Id
-                        };
-                        product.Images.Add(image);
+                            var image = new ProductImage
+                            {
+                                Url = await SaveImage(file),
+                                ProductId = product.Id
+                            };
+                            product.Images.Add(image);
+                        }
                     }
+                    await _productRepository.UpdateAsync(product);
                 }
-                await _productRepository.AddAsync(product);
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction(nameof(Index), "Product", new { area = "Admin" });
             }
 
             var categories = await _categoryRepository.GetAllAsync();
@@ -86,28 +93,46 @@ namespace NgoMinhHung_2280601103.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
             if (ModelState.IsValid)
             {
-                if (imageUrl != null)
+                var existingProduct = await _productRepository.GetByIdAsync(id);
+                if (existingProduct == null)
                 {
-                    product.ImageUrl = await SaveImage(imageUrl);
+                    return NotFound();
                 }
-                if (imageUrls != null)
+
+                existingProduct.Name = product.Name;
+                existingProduct.Price = product.Price;
+                existingProduct.Description = product.Description;
+                existingProduct.CategoryId = product.CategoryId;
+
+                if (imageUrl != null && imageUrl.Length > 0)
                 {
-                    product.Images = new List<ProductImage>();
+                    existingProduct.ImageUrl = await SaveImage(imageUrl);
+                }
+
+                if (imageUrls != null && imageUrls.Count > 0 && imageUrls.Any(f => f != null && f.Length > 0))
+                {
+                    existingProduct.Images = new List<ProductImage>();
                     foreach (var file in imageUrls)
                     {
-                        var image = new ProductImage
+                        if (file != null && file.Length > 0)
                         {
-                            Url = await SaveImage(file),
-                            ProductId = product.Id
-                        };
-                        product.Images.Add(image);
+                            var image = new ProductImage
+                            {
+                                Url = await SaveImage(file),
+                                ProductId = existingProduct.Id
+                            };
+                            existingProduct.Images.Add(image);
+                        }
                     }
                 }
-                await _productRepository.UpdateAsync(product);
-                return RedirectToAction(nameof(Index));
+
+                await _productRepository.UpdateAsync(existingProduct);
+                return RedirectToAction(nameof(Index), "Product", new { area = "Admin" });
             }
+
             var categories = await _categoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
             return View(product);
@@ -127,7 +152,19 @@ namespace NgoMinhHung_2280601103.Areas.Admin.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _productRepository.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), "Product", new { area = "Admin" });
+        }
+
+        // Thêm hành động Details
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            Console.WriteLine($"Images count: {(product.Images != null ? product.Images.Count : 0)}");
+            return View(product);
         }
 
         private async Task<string> SaveImage(IFormFile image)

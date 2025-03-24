@@ -1,147 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using NgoMinhHung_2280601103.Models;
 using NgoMinhHung_2280601103.Repository;
-using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
-public class ProductController : Controller
+
+namespace NgoMinhHung_2280601103.Controllers
 {
-    private readonly IProductRepository _productRepository;
-    private readonly ICategoryRepository _categoryRepository;
-
-    public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository)
+    public class ProductController : Controller
     {
-        _productRepository = productRepository;
-        _categoryRepository = categoryRepository;
-    }
+        private readonly IProductRepository _productRepository;
 
-    public async Task<IActionResult> Index()
-    {
-        var products = await _productRepository.GetAllAsync();
-        return View(products);
-    }
-
-    public async Task<IActionResult> Add()
-    {
-        var categories = await _categoryRepository.GetAllAsync();
-        ViewBag.Categories = new SelectList(categories, "Id", "Name");
-        return View();
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Add(Product product, IFormFile imageUrl, List<IFormFile> imageUrls)
-    {
-        if (ModelState.IsValid)
+        public ProductController(IProductRepository productRepository)
         {
-            if (imageUrl != null)
+            _productRepository = productRepository;
+        }
+
+        // Xem danh sách sản phẩm
+        public async Task<IActionResult> Index()
+        {
+            var products = await _productRepository.GetAllAsync();
+            return View(products);
+        }
+
+        // Xem chi tiết sản phẩm
+        public async Task<IActionResult> Display(int id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null)
             {
-                product.ImageUrl = await SaveImage(imageUrl);
+                return NotFound();
             }
-            if (imageUrls != null)
-            {
-                product.Images = new List<ProductImage>();
-                foreach (var file in imageUrls)
-                {
-                    var image = new ProductImage
-                    {
-                        Url = await SaveImage(file),
-                        ProductId = product.Id
-                    };
-                    product.Images.Add(image);
-                }
-            }
-            await _productRepository.AddAsync(product);
-            return RedirectToAction(nameof(Index));
+            return View(product);
         }
-
-        var categories = await _categoryRepository.GetAllAsync();
-        ViewBag.Categories = new SelectList(categories, "Id", "Name");
-        return View(product);
-    }
-
-    public async Task<IActionResult> Display(int id)
-    {
-        var product = await _productRepository.GetByIdAsync(id);
-        if (product == null)
-        {
-            return NotFound();
-        }
-        return View(product);
-    }
-
-    public async Task<IActionResult> Update(int id)
-    {
-        var product = await _productRepository.GetByIdAsync(id);
-        if (product == null)
-        {
-            return NotFound();
-        }
-        var categories = await _categoryRepository.GetAllAsync();
-        ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
-        return View(product);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl, List<IFormFile> imageUrls)
-    {
-        if (id != product.Id)
-        {
-            return NotFound();
-        }
-        if (ModelState.IsValid)
-        {
-            if (imageUrl != null)
-            {
-                product.ImageUrl = await SaveImage(imageUrl);
-            }
-            if (imageUrls != null)
-            {
-                product.Images = new List<ProductImage>();
-                foreach (var file in imageUrls)
-                {
-                    var image = new ProductImage
-                    {
-                        Url = await SaveImage(file),
-                        ProductId = product.Id
-                    };
-                    product.Images.Add(image);
-                }
-            }
-            await _productRepository.UpdateAsync(product);
-            return RedirectToAction(nameof(Index));
-        }
-        var categories = await _categoryRepository.GetAllAsync();
-        ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
-        return View(product);
-    }
-
-    public async Task<IActionResult> Delete(int id)
-    {
-        var product = await _productRepository.GetByIdAsync(id);
-        if (product == null)
-        {
-            return NotFound();
-        }
-        return View(product);
-    }
-
-    [HttpPost, ActionName("Delete")]
-    public async Task<IActionResult> DeleteConfirmed(int id)
-    {
-        await _productRepository.DeleteAsync(id);
-        return RedirectToAction(nameof(Index));
-    }
-
-    private async Task<string> SaveImage(IFormFile image)
-    {
-        var savePath = Path.Combine("wwwroot/images", image.FileName);
-        using (var fileStream = new FileStream(savePath, FileMode.Create))
-        {
-            await image.CopyToAsync(fileStream);
-        }
-        return "/images/" + image.FileName;
     }
 }

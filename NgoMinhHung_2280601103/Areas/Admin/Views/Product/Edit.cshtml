@@ -2,40 +2,40 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
 @{
     ViewData["Title"] = "Edit Product";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+
 <h2>Edit Product</h2>
-<form asp-action="Update" method="post" enctype="multipart/form-data">
+<form asp-area="Admin" asp-action="Edit" method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="Id" />
     <div class="form-group">
-        <label asp-for="Name"></label>
+        <label asp-for="Name">Name</label>
         <input asp-for="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Price"></label>
+        <label asp-for="Price">Price</label>
         <input asp-for="Price" class="form-control" />
         <span asp-validation-for="Price" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Description"></label>
+        <label asp-for="Description">Description</label>
         <textarea asp-for="Description" class="form-control"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="CategoryId">Category</label>
-        <select asp-for="CategoryId" asp-items="@ViewBag.Categories" class="form-control"></select>
+        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-control"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="ImageUrl">Product Image</label>
+        <label>Current Image</label>
+        <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width: 200px;" />
+        <label>Upload New Image</label>
         <input type="file" name="imageUrl" class="form-control" />
-        <img src="@Model.ImageUrl" alt="Product Image" style="max-width: 200px;" />
     </div>
     <div class="form-group">
-        <label asp-for="Images">Additional Images</label>
-        <input type="file" name="imageUrls" class="form-control" multiple />
+        <label>Additional Images</label>
         @if (Model.Images != null && Model.Images.Any())
         {
             foreach (var image in Model.Images)
@@ -43,6 +43,12 @@
                 <img src="@image.Url" alt="Additional Image" style="max-width: 200px;" />
             }
         }
+        <input type="file" name="imageUrls" class="form-control" multiple />
     </div>
-    <button type="submit" class="btn btn-primary">Update</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
