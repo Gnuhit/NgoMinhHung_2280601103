@@ -8,7 +8,7 @@
 <div>
     <p><strong>Price:</strong> @Model.Price</p>
     <p><strong>Description:</strong> @Model.Description</p>
-    <p><strong>Category:</strong> @Model.Category?.Name ?? "No Category"</p>
+    <p><strong>Category:</strong> @Model.Category?.Name</p>
     <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width: 300px;" />
     @if (Model.Images != null && Model.Images.Any())
     {

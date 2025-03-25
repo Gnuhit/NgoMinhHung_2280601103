@@ -17,12 +17,21 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Identity/Account/Login";
     options.LogoutPath = "/Identity/Account/Logout";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // S?a l?i typo t? LogoutPath thành AccessDeniedPath
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied"; 
 });
 
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -32,7 +41,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
 }
 
-app.UseStaticFiles(); // Ph?c v? t?p t?nh nh? hình ?nh
+app.UseStaticFiles();
+app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -6,6 +6,8 @@
     <title>@ViewData["Title"] - NgoMinhHung_2280601103</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+          rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/NgoMinhHung_2280601103.styles.css" asp-append-version="true" />
 </head>
@@ -28,6 +30,12 @@
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
+                    <form class="d-flex" asp-controller="ShoppingCart" asp-action="Index" method="get">
+                        <button class="btn btn-outline-dark" type="submit">
+                            <i class="bi-cart-fill me-1"></i>
+                            Cart
+                        </button>
+                    </form>
                 </div>
             </div>
         </nav>

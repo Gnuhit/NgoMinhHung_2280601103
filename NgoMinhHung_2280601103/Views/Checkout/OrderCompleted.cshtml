@@ -1,0 +1,32 @@
+﻿@model Order
+
+<h2>Order Completed</h2>
+<p>Your order with ID @Model.Id has been placed successfully.</p>
+<p><strong>Order Date:</strong> @Model.OrderDate.ToString("g")</p>
+<p><strong>Shipping Address:</strong> @Model.ShippingAddress</p>
+<p><strong>Total Price:</strong> @Model.TotalPrice.ToString("C")</p>
+
+<h3>Order Details</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var detail in Model.OrderDetails)
+        {
+            <tr>
+                <td>@detail.Product?.Name</td>
+                <td>@detail.Quantity</td>
+                <td>@detail.Price.ToString("C")</td>
+                <td>@(detail.Price * detail.Quantity).ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-primary">Continue Shopping</a>
